@@ -10,19 +10,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.RecordInterceptor;
+import org.springframework.kafka.support.converter.JsonMessageConverter;
 
 import java.util.HashMap;
 
 @Log4j2
 @Configuration
-public class StrConsumerConfig {
+public class PaymentConsumerConfig {
 
     @Autowired
     private KafkaProperties properties;
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
         var configs = new HashMap<String, Object>();
         configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -32,27 +32,10 @@ public class StrConsumerConfig {
 
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> strContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
+    public ConcurrentKafkaListenerContainerFactory<String, Object> paymentContainerFactory(ConsumerFactory<String, Object> consumerFactory) {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, Object>();
         factory.setConsumerFactory(consumerFactory);
+        factory.setMessageConverter(new JsonMessageConverter());
         return factory;
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> validContainerFactory(ConsumerFactory<String, String> consumerFactory) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<String, String>();
-        factory.setConsumerFactory(consumerFactory);
-        factory.setRecordInterceptor(validMessage());
-        return factory;
-    }
-
-    private RecordInterceptor<String, String> validMessage() {
-        return record -> {
-          if(record.value().contains("test")){
-              log.info("Possui a palavra test");
-              return record;
-          }
-          return record;
-        };
     }
 }

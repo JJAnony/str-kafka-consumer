@@ -11,15 +11,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @KafkaListener
-public @interface StrConsumerCustomListener {
+public @interface PaymentConsumerCustomListener {
 
     @AliasFor(annotation = KafkaListener.class, attribute = "groupId")
     String groupId() default "";
     @AliasFor(annotation = KafkaListener.class, attribute = "topics")
-    String[] topics() default "str-topic";
+    String[] topics() default "payment-topic";
 
     @AliasFor(annotation = KafkaListener.class, attribute = "containerFactory")
-    String containerFactory() default "strContainerFactory";
+    String containerFactory() default "paymentContainerFactory";
 
     @AliasFor(annotation = KafkaListener.class, attribute = "errorHandler")
     String errorHandler() default "errorCustomHandler";
